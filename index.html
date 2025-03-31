@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abertura de Chamados</title>
+    <link rel="stylesheet" href="/styles/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .priority-high { color: #dc3545; font-weight: bold; }
+        .priority-medium { color: #fd7e14; font-weight: bold; }
+        .priority-low { color: #28a745; font-weight: bold; }
+    </style>
+</head>
+
+<body>
+    <nav class="container p-3 navbar navbar-expand-lg navbar-light bg-light rounded">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-headset me-2"></i>Helpdesk - Sistema de Chamados
+            </a>
+            <div class="d-flex">
+                <button class="btn btn-primary me-2" disabled>
+                    <i class="fas fa-plus me-1"></i> Novo Chamado
+                </button>
+                <a href="prontuario.html" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-file-alt me-1"></i> Prontuários
+                </a>
+                <a href="login.html" class="btn btn-outline-warning">
+                    <i class="fas fa-user-shield me-1"></i> Área Admin
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-ticket-alt me-2"></i>Abertura de Chamado
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="chamadoForm" novalidate>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="nomeSolicitante" class="form-label">Nome do Solicitante*</label>
+                                    <input type="text" class="form-control" id="nomeSolicitante" 
+                                           placeholder="Nome completo ou setor" required>
+                                    <div class="invalid-feedback">Por favor, informe o solicitante.</div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="contato" class="form-label">Contato*</label>
+                                    <input type="text" class="form-control" id="contato" 
+                                           placeholder="Telefone ou e-mail" required>
+                                    <div class="invalid-feedback">Informe um contato válido.</div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="escola" class="form-label">Escola*</label>
+                                    <select class="form-select" id="escola" required>
+                                        <option value="" disabled selected>Selecione a escola</option>
+                                        <optgroup label="Escolas Municipais">
+                                            <option value="Escola Municipal A">Escola Municipal A</option>
+                                            <option value="Escola Municipal B">Escola Municipal B</option>
+                                        </optgroup>
+                                        <optgroup label="Escolas Estaduais">
+                                            <option value="Escola Estadual C">Escola Estadual C</option>
+                                            <option value="Escola Estadual D">Escola Estadual D</option>
+                                        </optgroup>
+                                        <optgroup label="Escolas Particulares">
+                                            <option value="Escola Particular E">Escola Particular E</option>
+                                        </optgroup>
+                                    </select>
+                                    <div class="invalid-feedback">Selecione uma escola.</div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="defeito" class="form-label">Tipo de Problema*</label>
+                                    <select class="form-select" id="defeito" required>
+                                        <option value="" disabled selected>Selecione o problema</option>
+                                        <option value="Computador não liga" data-prioridade="alta">Computador não liga</option>
+                                        <option value="Tela azul aparece frequentemente" data-prioridade="alta">Tela azul aparece frequentemente</option>
+                                        <option value="Internet lenta" data-prioridade="media">Internet lenta</option>
+                                        <option value="Impressora não imprime" data-prioridade="media">Impressora não imprime</option>
+                                        <option value="Teclado ou mouse não funcionam" data-prioridade="baixa">Teclado ou mouse não funcionam</option>
+                                        <option value="Sem som nos alto-falantes" data-prioridade="baixa">Sem som nos alto-falantes</option>
+                                        <option value="Software travando constantemente" data-prioridade="alta">Software travando constantemente</option>
+                                        <option value="Não consigo acessar a rede Wi-Fi" data-prioridade="media">Não consigo acessar a rede Wi-Fi</option>
+                                        <option value="Monitor não exibe imagem" data-prioridade="alta">Monitor não exibe imagem</option>
+                                        <option value="Disco rígido fazendo barulho" data-prioridade="alta">Disco rígido fazendo barulho</option>
+                                    </select>
+                                    <div class="invalid-feedback">Selecione o tipo de problema.</div>
+                                </div>
+                                
+                                <div class="col-md-12">
+                                    <label for="descricao" class="form-label">Descrição Detalhada</label>
+                                    <textarea class="form-control" id="descricao" rows="3" 
+                                              placeholder="Descreva com detalhes o problema..."></textarea>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="prioridade" class="form-label">Prioridade</label>
+                                    <input type="text" class="form-control" id="prioridade" readonly>
+                                </div>
+                                
+                                <div class="col-12 mt-4">
+                                    <button type="submit" class="btn btn-primary px-4">
+                                        <i class="fas fa-paper-plane me-2"></i>Enviar Chamado
+                                    </button>
+                                    <button type="reset" class="btn btn-outline-secondary ms-2">
+                                        <i class="fas fa-eraser me-2"></i>Limpar
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+        crossorigin="anonymous"></script>
+
+    <script>
+        // Função para gerar ID único
+        function gerarIdUnico() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        }
+
+        // Atualiza a prioridade quando seleciona um defeito
+        document.getElementById('defeito').addEventListener('change', function() {
+            const prioridade = this.options[this.selectedIndex].getAttribute('data-prioridade');
+            const prioridadeInput = document.getElementById('prioridade');
+            
+            prioridadeInput.value = prioridade;
+            
+            // Aplica classe CSS conforme a prioridade
+            prioridadeInput.className = 'form-control ';
+            if (prioridade === 'alta') prioridadeInput.classList.add('priority-high');
+            else if (prioridade === 'media') prioridadeInput.classList.add('priority-medium');
+            else if (prioridade === 'baixa') prioridadeInput.classList.add('priority-low');
+        });
+
+        // Validação do formulário
+        document.getElementById('chamadoForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const form = event.target;
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+            
+            // Cria objeto do chamado
+            const chamado = {
+                id: gerarIdUnico(),
+                nomeSolicitante: document.getElementById('nomeSolicitante').value.trim(),
+                contato: document.getElementById('contato').value.trim(),
+                escola: document.getElementById('escola').value,
+                defeito: document.getElementById('defeito').value,
+                prioridade: document.getElementById('prioridade').value,
+                descricao: document.getElementById('descricao').value.trim(),
+                status: 'Aberto',
+                dataAbertura: new Date().toISOString(),
+                tecnico: null,
+                dataReparo: null,
+                historico: []
+            };
+            
+            // Salva no localStorage
+            salvarChamado(chamado);
+            
+            // Feedback ao usuário
+            alert('Chamado cadastrado com sucesso! Nº: ' + chamado.id);
+            form.reset();
+            form.classList.remove('was-validated');
+            document.getElementById('prioridade').value = '';
+            document.getElementById('prioridade').className = 'form-control';
+        });
+
+        // Função para salvar chamado no localStorage
+        function salvarChamado(chamado) {
+            try {
+                // Recupera chamados existentes ou inicia um array vazio
+                let chamados = JSON.parse(localStorage.getItem('chamados')) || [];
+                
+                // Adiciona o novo chamado
+                chamados.push(chamado);
+                
+                // Salva no localStorage
+                localStorage.setItem('chamados', JSON.stringify(chamados));
+                
+                console.log('Chamado salvo:', chamado);
+            } catch (error) {
+                console.error('Erro ao salvar chamado:', error);
+                alert('Erro ao salvar o chamado. Consulte o console para detalhes.');
+            }
+        }
+
+        // Limpa o formulário
+        document.querySelector('button[type="reset"]').addEventListener('click', function() {
+            document.getElementById('prioridade').value = '';
+            document.getElementById('prioridade').className = 'form-control';
+            document.getElementById('chamadoForm').classList.remove('was-validated');
+        });
+    </script>
+</body>
+</html>
