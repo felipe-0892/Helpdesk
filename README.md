@@ -2,7 +2,9 @@
 #### Este é um sistema de Helpdesk desenvolvido utilizando HTML, CSS, JavaScript e Bootstrap, projetado para auxiliar no gerenciamento de chamados de suporte técnico. O sistema permite adicionar chamados, visualizar prontuários e gerar relatórios em PDF.
 
 ![imagem home](image-home.png)
+
 ![imagem admin](image-admin.png)
+
 ![imagem prontuario](image-prontuario.png)
 
 [Ir ao Helpdesk]()
