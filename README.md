@@ -7,7 +7,7 @@
 
 ![imagem prontuario](image-prontuario.png)
 
-[Ir ao Helpdesk]()
+[Ir ao Helpdesk](https://helpdesk-lovat-psi.vercel.app/index.html)
 
 # 📌 Funcionalidades
 
