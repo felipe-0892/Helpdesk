@@ -13,22 +13,24 @@
         .priority-high { color: #dc3545; font-weight: bold; }
         .priority-medium { color: #fd7e14; font-weight: bold; }
         .priority-low { color: #28a745; font-weight: bold; }
+        .priority-verify { color:#9B111E; font-weight: bold;}
     </style>
 </head>
 
-<body>
-    <nav class="container p-3 navbar navbar-expand-lg navbar-light bg-light rounded">
+<body class="bg-light">
+    <nav class="container p-3 mt-2 navbar navbar-expand-lg navbar-light rounded" style="background-color: #18264F;">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <i class="fas fa-headset me-2"></i>Helpdesk - Sistema de Chamados
+            <a class="navbar-brand text-white" href="#">
+                <i class="fas fa-headset me-2 text-white"></i>Helpdesk - Sistema de Chamados
             </a>
             <div class="d-flex">
+                <!--Caso queira adicionar os botões novamente, colocar um link a e retirar o disabled-->
                 <button class="btn btn-primary me-2" disabled>
                     <i class="fas fa-plus me-1"></i> Novo Chamado
                 </button>
-                <a href="prontuario.html" class="btn btn-outline-primary me-2">
+                <!-- <button href="prontuario.html" class="btn btn-outline-primary me-2" disabled>
                     <i class="fas fa-file-alt me-1"></i> Prontuários
-                </a>
+                </button> -->
                 <a href="login.html" class="btn btn-outline-warning">
                     <i class="fas fa-user-shield me-1"></i> Área Admin
                 </a>
@@ -40,7 +42,7 @@
         <div class="row justify-content-center">
             <div class="col-md-10">
                 <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header text-white" style="background-color: #18264F;">
                         <h3 class="card-title mb-0">
                             <i class="fas fa-ticket-alt me-2"></i>Abertura de Chamado
                         </h3>
@@ -80,21 +82,64 @@
                                     </select>
                                     <div class="invalid-feedback">Selecione uma escola.</div>
                                 </div>
-                                
                                 <div class="col-md-6">
                                     <label for="defeito" class="form-label">Tipo de Problema*</label>
                                     <select class="form-select" id="defeito" required>
                                         <option value="" disabled selected>Selecione o problema</option>
-                                        <option value="Computador não liga" data-prioridade="alta">Computador não liga</option>
-                                        <option value="Tela azul aparece frequentemente" data-prioridade="alta">Tela azul aparece frequentemente</option>
-                                        <option value="Internet lenta" data-prioridade="media">Internet lenta</option>
-                                        <option value="Impressora não imprime" data-prioridade="media">Impressora não imprime</option>
-                                        <option value="Teclado ou mouse não funcionam" data-prioridade="baixa">Teclado ou mouse não funcionam</option>
-                                        <option value="Sem som nos alto-falantes" data-prioridade="baixa">Sem som nos alto-falantes</option>
-                                        <option value="Software travando constantemente" data-prioridade="alta">Software travando constantemente</option>
-                                        <option value="Não consigo acessar a rede Wi-Fi" data-prioridade="media">Não consigo acessar a rede Wi-Fi</option>
-                                        <option value="Monitor não exibe imagem" data-prioridade="alta">Monitor não exibe imagem</option>
-                                        <option value="Disco rígido fazendo barulho" data-prioridade="alta">Disco rígido fazendo barulho</option>
+                                        
+                                        <!-- Problemas de Hardware -->
+                                        <optgroup label="Problemas de Hardware">
+                                            <option value="Computador não liga" data-prioridade="alta" data-categoria="hardware">Computador não liga</option>
+                                            <option value="Monitor não exibe imagem" data-prioridade="alta" data-categoria="hardware">Monitor não exibe imagem</option>
+                                            <option value="Disco rígido fazendo barulho" data-prioridade="alta" data-categoria="hardware">Disco rígido fazendo barulho</option>
+                                            <option value="Teclado ou mouse não funcionam" data-prioridade="baixa" data-categoria="hardware">Teclado ou mouse não funcionam</option>
+                                            <option value="Sem som nos alto-falantes" data-prioridade="baixa" data-categoria="hardware">Sem som nos alto-falantes</option>
+                                            <option value="Superaquecimento do computador" data-prioridade="alta" data-categoria="hardware">Superaquecimento do computador</option>
+                                            <option value="Portas USB não funcionam" data-prioridade="media" data-categoria="hardware">Portas USB não funcionam</option>
+                                            <option value="Ventoinha fazendo muito barulho" data-prioridade="media" data-categoria="hardware">Ventoinha fazendo muito barulho</option>
+                                            <option value="Bateria não carrega (notebook)" data-prioridade="alta" data-categoria="hardware">Bateria não carrega (notebook)</option>
+                                        </optgroup>
+                                        
+                                         <!-- Problemas de Software -->
+                                        <optgroup label="Problemas de Software">
+                                            <option value="Tela azul aparece frequentemente" data-prioridade="alta" data-categoria="software">Tela azul aparece frequentemente</option>
+                                            <option value="Software travando constantemente" data-prioridade="alta" data-categoria="software">Software travando constantemente</option>
+                                            <option value="Sistema operacional não inicia" data-prioridade="alta" data-categoria="software">Sistema operacional não inicia</option>
+                                            <option value="Programas abrem sozinhos" data-prioridade="media" data-categoria="software">Programas abrem sozinhos</option>
+                                            <option value="Mensagens de erro frequentes" data-prioridade="media" data-categoria="software">Mensagens de erro frequentes</option>
+                                            <option value="Computador muito lento" data-prioridade="media" data-categoria="software">Computador muito lento</option>
+                                            <option value="Atualizações não instalam" data-prioridade="baixa" data-categoria="software">Atualizações não instalam</option>
+                                            <option value="Vírus ou malware detectado" data-prioridade="alta" data-categoria="software">Vírus ou malware detectado</option>
+                                        </optgroup>
+                                        
+                                        <!-- Problemas com Internet -->
+                                        <optgroup label="Problemas com Internet">
+                                            <option value="Internet lenta" data-prioridade="media" data-categoria="internet">Internet lenta</option>
+                                            <option value="Não consigo acessar a rede Wi-Fi" data-prioridade="media" data-categoria="internet">Não consigo acessar a rede Wi-Fi</option>
+                                            <option value="Conexão cai frequentemente" data-prioridade="alta" data-categoria="internet">Conexão cai frequentemente</option>
+                                            <option value="Não consigo acessar sites específicos" data-prioridade="media" data-categoria="internet">Não consigo acessar sites específicos</option>
+                                            <option value="E-mail não envia/recebe" data-prioridade="media" data-categoria="internet">E-mail não envia/recebe</option>
+                                            <option value="VPN não conecta" data-prioridade="alta" data-categoria="internet">VPN não conecta</option>
+                                            <option value="Problemas com videoconferência" data-prioridade="media" data-categoria="internet">Problemas com videoconferência</option>
+                                        </optgroup>
+                                        
+                                        <!-- Problemas com Impressoras -->
+                                        <optgroup label="Problemas com Impressoras">
+                                            <option value="Impressora não imprime" data-prioridade="media" data-categoria="impressora">Impressora não imprime</option>
+                                            <option value="Impressora está offline" data-prioridade="media" data-categoria="impressora">Impressora está offline</option>
+                                            <option value="Impressão com falhas/manchada" data-prioridade="baixa" data-categoria="impressora">Impressão com falhas/manchada</option>
+                                            <option value="Papel frequentemente emperra" data-prioridade="baixa" data-categoria="impressora">Papel frequentemente emperra</option>
+                                            <option value="Impressora não é detectada" data-prioridade="media" data-categoria="impressora">Impressora não é detectada</option>
+                                            <option value="Problemas com impressão em rede" data-prioridade="media" data-categoria="impressora">Problemas com impressão em rede</option>
+                                        </optgroup>
+                                        
+                                        <!-- Problemas Diversos -->
+                                        <optgroup label="Problemas Diversos">
+                                            <option value="Esqueci minha senha" data-prioridade="media" data-categoria="diversos">Esqueci minha senha</option>
+                                            <option value="Problemas com backup" data-prioridade="alta" data-categoria="diversos">Problemas com backup</option>
+                                            <option value="Configurações perdidas/resetadas" data-prioridade="media" data-categoria="diversos">Configurações perdidas/resetadas</option>
+                                            <option value="Outro problema não listado" data-prioridade="baixa" data-categoria="diversos">Outro problema não listado</option>
+                                        </optgroup>
                                     </select>
                                     <div class="invalid-feedback">Selecione o tipo de problema.</div>
                                 </div>
@@ -111,10 +156,10 @@
                                 </div>
                                 
                                 <div class="col-12 mt-4">
-                                    <button type="submit" class="btn btn-primary px-4">
+                                    <button type="submit" class="btn btn-outline-warning px-4">
                                         <i class="fas fa-paper-plane me-2"></i>Enviar Chamado
                                     </button>
-                                    <button type="reset" class="btn btn-outline-secondary ms-2">
+                                    <button type="reset" class="btn btn-outline-danger ms-2">
                                         <i class="fas fa-eraser me-2"></i>Limpar
                                     </button>
                                 </div>
@@ -151,6 +196,7 @@
             if (prioridade === 'alta') prioridadeInput.classList.add('priority-high');
             else if (prioridade === 'media') prioridadeInput.classList.add('priority-medium');
             else if (prioridade === 'baixa') prioridadeInput.classList.add('priority-low');
+            else if (prioridade === 'VERIFICAR') prioridadeInput.classList.add('priority-verify');
         });
 
         // Validação do formulário

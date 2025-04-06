@@ -15,12 +15,15 @@
             display: inline-block;
             text-align: center;
         }
+
         .action-buttons {
             white-space: nowrap;
         }
+
         #buscaChamados {
             max-width: 400px;
         }
+
         .table-responsive {
             overflow-x: auto;
         }
@@ -28,21 +31,21 @@
 </head>
 
 <body>
-    <div class="container mt-4 mb-5">
+    <div class="container mt-lg-5 mt-5 mb-5 p-4">
         <div class="container">
-            <h1 class="text-center mb-4">Área Administrativa</h1>
-            <nav class="container p-4 navbar navbar-expand-lg navbar-light bg-light rounded shadow-sm">
+            <!-- <h1 class="text-center mb-4">Área Administrativa</h1> -->
+            <nav class="container p-4 navbar navbar-expand-lg navbar-light rounded shadow-sm" style="background-color: #18264F;">
                 <div class="container-fluid">
-                    <a class="navbar-brand fw-bold" href="#">
+                    <a class="navbar-brand fw-bold text-white" href="#">
                         <i class="fas fa-headset me-2"></i>Helpdesk - Área Administrativa
                     </a>
                     <div class="d-flex">
                         <a href="index.html" class="btn btn-outline-primary me-2">
                             <i class="fas fa-plus me-1"></i> Novo Chamado
                         </a>
-                        <a href="prontuario.html" class="btn btn-outline-primary me-2">
+                        <!-- <a href="prontuario.html" class="btn btn-outline-primary me-2">
                             <i class="fas fa-file-alt me-1"></i> Prontuários
-                        </a>
+                        </a> -->
                         <button id="btnAdmin" class="btn btn-outline-dark" disabled>
                             <i class="fas fa-user-shield me-1"></i>Admin
                         </button>
@@ -52,7 +55,7 @@
                     </div>
                 </div>
             </nav>
-            
+
             <!-- Gerenciamento de Chamados -->
             <section class="mt-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -67,7 +70,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="table-responsive rounded shadow-sm">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
@@ -125,102 +128,102 @@
             currentAction: null,
             currentChamadoId: null,
             modal: null,
-            
-            init: function() {
+
+            init: function () {
                 console.log("Inicializando aplicação...");
                 this.modal = new bootstrap.Modal(document.getElementById('confirmModal'));
-                
+
                 // Verificar autenticação
                 this.checkAuth();
-                
+
                 // Inicializar componentes
                 this.initComponents();
-                
+
                 // Carregar dados
                 this.loadData();
-                
+
                 console.log("Aplicação inicializada com sucesso");
             },
-            
-            checkAuth: function() {
+
+            checkAuth: function () {
                 const usuarioAutenticado = localStorage.getItem('usuarioAutenticado');
                 const isAdmin = localStorage.getItem('isAdmin') === 'true';
-                
+
                 if (!usuarioAutenticado) {
                     this.redirectToLogin();
                     return;
                 }
-                
+
                 if (!isAdmin) {
                     alert('Acesso restrito a administradores. Redirecionando...');
                     window.location.href = 'index.html';
                     return;
                 }
             },
-            
-            redirectToLogin: function() {
+
+            redirectToLogin: function () {
                 alert('Acesso não autorizado. Redirecionando para a página de login...');
                 window.location.href = 'login.html';
             },
-            
-            initComponents: function() {
+
+            initComponents: function () {
                 // Botão de logout
                 document.getElementById('btnLogout').addEventListener('click', () => {
                     localStorage.removeItem('usuarioAutenticado');
                     localStorage.removeItem('isAdmin');
                     this.redirectToLogin();
                 });
-                
+
                 // Busca de chamados
                 document.getElementById('buscaChamados').addEventListener('input', (e) => {
                     this.searchChamados(e.target.value.trim().toLowerCase());
                 });
-                
+
                 // Botão limpar busca
                 document.getElementById('btnLimparBusca').addEventListener('click', () => {
                     document.getElementById('buscaChamados').value = '';
                     this.searchChamados('');
                 });
-                
+
                 // Modal de confirmação
                 document.getElementById('modalConfirmBtn').addEventListener('click', () => {
                     this.executeAction();
                 });
             },
-            
-            loadData: function() {
+
+            loadData: function () {
                 console.log("Carregando dados...");
                 this.verifyAndFixData();
                 this.renderChamados();
             },
-            
-            verifyAndFixData: function() {
+
+            verifyAndFixData: function () {
                 try {
                     let chamados = JSON.parse(localStorage.getItem('chamados')) || [];
                     let needsFix = false;
-                    
+
                     chamados = chamados.map(chamado => {
                         // Corrigir IDs ausentes
                         if (!chamado.id || chamado.id === 'undefined') {
                             chamado.id = this.generateId();
                             needsFix = true;
                         }
-                        
+
                         // Garantir status padrão
                         if (!chamado.status) {
                             chamado.status = 'Aberto';
                             needsFix = true;
                         }
-                        
+
                         // Garantir prioridade padrão
                         if (!chamado.prioridade) {
                             chamado.prioridade = 'baixa';
                             needsFix = true;
                         }
-                        
+
                         return chamado;
                     });
-                    
+
                     if (needsFix) {
                         localStorage.setItem('chamados', JSON.stringify(chamados));
                         console.log("Dados corrigidos com sucesso");
@@ -229,12 +232,12 @@
                     console.error("Erro ao verificar dados:", error);
                 }
             },
-            
-            generateId: function() {
+
+            generateId: function () {
                 return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
             },
-            
-            getChamados: function() {
+
+            getChamados: function () {
                 try {
                     return JSON.parse(localStorage.getItem('chamados')) || [];
                 } catch (error) {
@@ -242,100 +245,111 @@
                     return [];
                 }
             },
-            
-            searchChamados: function(term) {
+
+            searchChamados: function (term) {
                 const chamados = this.getChamados();
-                
+
                 if (!term) {
                     this.renderChamados(chamados);
                     return;
                 }
-                
-                const results = chamados.filter(chamado => 
+
+                const results = chamados.filter(chamado =>
                     (chamado.nomeSolicitante && chamado.nomeSolicitante.toLowerCase().includes(term)) ||
                     (chamado.escola && chamado.escola.toLowerCase().includes(term)) ||
                     (chamado.defeito && chamado.defeito.toLowerCase().includes(term)) ||
                     (chamado.id && chamado.id.toLowerCase().includes(term))
                 );
-                
+
                 this.renderChamados(results);
             },
-            
-            renderChamados: function(chamados = null) {
+
+            renderChamados: function (chamados = null) {
                 const listaChamados = document.getElementById('listaChamados');
                 const semResultados = document.getElementById('semResultados');
-                
+
                 if (!listaChamados) return;
-                
+
                 // Se não for passado um array, pega todos os chamados
                 if (!chamados) {
                     chamados = this.getChamados();
                 }
-                
+
                 listaChamados.innerHTML = '';
-                
+
                 if (chamados.length === 0) {
                     semResultados.classList.remove('d-none');
                     return;
                 }
-                
+
                 semResultados.classList.add('d-none');
-                
+
                 chamados.forEach(chamado => {
                     const row = document.createElement('tr');
                     row.innerHTML = this.getChamadoRowHTML(chamado);
                     listaChamados.appendChild(row);
                 });
             },
-            
-            getChamadoRowHTML: function(chamado) {
+
+            getChamadoRowHTML: function (chamado) {
                 const prioridadeClass = {
                     'alta': 'bg-danger',
                     'media': 'bg-warning',
                     'baixa': 'bg-success'
                 }[chamado.prioridade] || 'bg-secondary';
-                
+
                 const statusClass = {
                     'Aberto': 'bg-primary',
                     'Concluído': 'bg-success',
                     'Em andamento': 'bg-info'
                 }[chamado.status] || 'bg-secondary';
-                
+
                 const dataFormatada = this.formatDate(chamado.dataAbertura);
-                
+
+                // Botão para prontuário (apenas para chamados concluídos)
+                const prontuarioBtn = chamado.status === 'Concluído' ? `
+                 <a href="prontuario.html?id=${chamado.id}" class="btn btn-sm btn-info me-1">
+                <i class="fas fa-file-alt me-1"></i>Prontuário
+                </a>
+                ` : '';
+
+                // Botão de concluir (apenas para chamados abertos)
+                const concluirBtn = chamado.status === 'Aberto' ? `
+                <button class="btn btn-sm btn-success me-1" onclick="App.confirmAction('concluir', '${chamado.id}')">
+                    <i class="fas fa-check-circle me-1"></i>Concluir
+                </button>
+                ` : '';
+
                 return `
-                    <td>${chamado.id || 'N/A'}</td>
-                    <td>${chamado.nomeSolicitante || 'N/A'}</td>
-                    <td>${chamado.escola || 'N/A'}</td>
-                    <td>${this.truncateText(chamado.defeito, 30) || 'N/A'}</td>
-                    <td><span class="badge ${prioridadeClass} status-badge">${chamado.prioridade || 'baixa'}</span></td>
-                    <td><span class="badge ${statusClass} status-badge">${chamado.status || 'N/A'}</span></td>
-                    <td>${dataFormatada || 'N/A'}</td>
-                    <td class="text-end action-buttons">
-                        ${chamado.status === 'Aberto' ? `
-                            <button class="btn btn-sm btn-success me-1" onclick="App.confirmAction('concluir', '${chamado.id}')">
-                                <i class="fas fa-check-circle me-1"></i>Concluir
-                            </button>
-                        ` : ''}
-                        <button class="btn btn-sm btn-danger" onclick="App.confirmAction('remover', '${chamado.id}')">
-                            <i class="fas fa-trash-alt me-1"></i>Remover
-                        </button>
-                    </td>
-                `;
+                <td>${chamado.id || 'N/A'}</td>
+                <td>${chamado.nomeSolicitante || 'N/A'}</td>
+                <td>${chamado.escola || 'N/A'}</td>
+                <td>${this.truncateText(chamado.defeito, 30) || 'N/A'}</td>
+                <td><span class="badge ${prioridadeClass} status-badge">${chamado.prioridade || 'baixa'}</span></td>
+                <td><span class="badge ${statusClass} status-badge">${chamado.status || 'N/A'}</span></td>
+                <td>${dataFormatada || 'N/A'}</td>
+                <td class="text-end action-buttons">
+                    ${concluirBtn}
+                    ${prontuarioBtn}
+                    <button class="btn btn-sm btn-danger" onclick="App.confirmAction('remover', '${chamado.id}')">
+                        <i class="fas fa-trash-alt me-1"></i>Remover
+                    </button>
+                </td>
+            `;
             },
-            
-            truncateText: function(text, maxLength) {
+
+            truncateText: function (text, maxLength) {
                 if (!text) return '';
                 return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
             },
-            
-            formatDate: function(dateString) {
+
+            formatDate: function (dateString) {
                 if (!dateString) return 'N/A';
-                
+
                 try {
                     const date = new Date(dateString);
                     if (isNaN(date.getTime())) return 'Data inválida';
-                    
+
                     return date.toLocaleDateString('pt-BR', {
                         day: '2-digit',
                         month: '2-digit',
@@ -346,39 +360,35 @@
                     return 'N/A';
                 }
             },
-            
-            isValidDate: function(dateString) {
+
+            isValidDate: function (dateString) {
                 const regex = /^\d{2}\/\d{2}\/\d{4}$/;
                 if (!regex.test(dateString)) return false;
-                
+
                 const [day, month, year] = dateString.split('/');
                 const date = new Date(year, month - 1, day);
-                
-                return date.getFullYear() == year && 
-                       (date.getMonth() + 1) == month && 
-                       date.getDate() == day;
+
+                return date.getFullYear() == year &&
+                    (date.getMonth() + 1) == month &&
+                    date.getDate() == day;
             },
-            
-            parseDate: function(dateString) {
+
+            parseDate: function (dateString) {
                 const [day, month, year] = dateString.split('/');
                 return new Date(year, month - 1, day).toISOString();
             },
-            
-            confirmAction: function(action, id) {
+
+            confirmAction: function (action, id) {
                 this.currentAction = action;
                 this.currentChamadoId = id;
-                
+
                 const modalTitle = document.getElementById('modalTitle');
                 const modalBody = document.getElementById('modalBody');
-                
+
                 if (action === 'concluir') {
                     modalTitle.textContent = 'Concluir Chamado';
                     modalBody.innerHTML = `
                         <p>Tem certeza que deseja marcar este chamado como concluído?</p>
-                        <div class="mb-3">
-                            <label for="tecnicoInput" class="form-label">Técnico Responsável:</label>
-                            <input type="text" class="form-control" id="tecnicoInput" required>
-                        </div>
                         <div class="mb-3">
                             <label for="dataReparoInput" class="form-label">Data do Reparo (DD/MM/AAAA):</label>
                             <input type="text" class="form-control" id="dataReparoInput" required>
@@ -388,13 +398,13 @@
                     modalTitle.textContent = 'Remover Chamado';
                     modalBody.textContent = 'Tem certeza que deseja remover permanentemente este chamado?';
                 }
-                
+
                 this.modal.show();
             },
-            
-            executeAction: function() {
+
+            executeAction: function () {
                 this.modal.hide();
-                
+
                 switch (this.currentAction) {
                     case 'concluir':
                         this.concluirChamado();
@@ -404,52 +414,46 @@
                         break;
                 }
             },
-            
-            concluirChamado: function() {
-                const tecnico = document.getElementById('tecnicoInput').value.trim();
-                const dataReparo = document.getElementById('dataReparoInput').value.trim();
-                
-                if (!tecnico) {
-                    alert('O nome do técnico é obrigatório!');
-                    return;
-                }
-                
-                if (!this.isValidDate(dataReparo)) {
-                    alert('Data inválida! Use o formato DD/MM/AAAA.');
-                    return;
-                }
-                
-                const chamados = this.getChamados();
-                const index = chamados.findIndex(c => c.id === this.currentChamadoId);
-                
-                if (index === -1) {
-                    alert('Chamado não encontrado!');
-                    return;
-                }
-                
-                chamados[index].status = 'Concluído';
-                chamados[index].tecnico = tecnico;
-                chamados[index].dataReparo = this.parseDate(dataReparo);
-                
-                localStorage.setItem('chamados', JSON.stringify(chamados));
-                this.renderChamados();
-                
-                alert('Chamado concluído com sucesso!');
-            },
-            
-            removerChamado: function() {
+
+            concluirChamado: function () {
+            const dataReparo = document.getElementById('dataReparoInput').value.trim();
+
+            if (!this.isValidDate(dataReparo)) {
+                alert('Data inválida! Use o formato DD/MM/AAAA.');
+                return;
+            }
+
+            const chamados = this.getChamados();
+            const index = chamados.findIndex(c => c.id === this.currentChamadoId);
+
+            if (index === -1) {
+                alert('Chamado não encontrado!');
+                return;
+            }
+
+            chamados[index].status = 'Concluído';
+            chamados[index].dataReparo = this.parseDate(dataReparo);
+
+            localStorage.setItem('chamados', JSON.stringify(chamados));
+            this.renderChamados();
+
+            alert('Chamado concluído com sucesso!');
+        },
+
+            removerChamado: function () {
                 const chamados = this.getChamados();
                 const updatedChamados = chamados.filter(c => c.id !== this.currentChamadoId);
-                
+
                 localStorage.setItem('chamados', JSON.stringify(updatedChamados));
                 this.renderChamados();
-                
+
                 alert('Chamado removido com sucesso!');
             }
         };
-        
+
         // Inicializar a aplicação quando o DOM estiver pronto
         document.addEventListener('DOMContentLoaded', () => App.init());
     </script>
 </body>
+
 </html>

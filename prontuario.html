@@ -94,8 +94,10 @@
                         <div id="detalhesProntuario" style="display: none;">
                             <form id="formProntuario">
                                 <div class="mb-3">
-                                    <label for="nomeTecnico" class="form-label">Técnico Responsável*</label>
-                                    <input type="text" class="form-control" id="nomeTecnico" required>
+                                    <!-- <label for="nomeTecnico" class="form-label">Técnico Responsável*</label>
+                                    <input type="text" class="form-control" id="nomeTecnico" required> -->
+                                    <h6 class="mb-3">Técnico Responsável</h6>
+                                    <p class="text-muted mb-3">Será solicitado ao salvar</p>
                                 </div>
                                 <div class="mb-3">
                                     <label for="descricaoReparo" class="form-label">Descrição do Reparo*</label>
@@ -127,14 +129,28 @@
         <div class="row mt-4">
             <div class="col-12">
                 <div class="card">
-                    <div class="card-header bg-info text-white">
+                    <!-- <div class="card-header bg-info text-white">
                         <h5 class="card-title mb-0">
                             <i class="fas fa-list me-2"></i>Histórico de Prontuários
                         </h5>
+                    </div> -->
+                    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-list me-2"></i>Histórico de Chamados
+                        </h5>
+                        <div class="d-flex">
+                            <div class="input-group me-2" style="width: 300px;">
+                                <span class="input-group-text"><i class="fas fa-school"></i></span>
+                                <select class="form-select" id="filtroEscola">
+                                    <option value="">Todas as escolas</option>
+                                    <!-- As opções serão preenchidas dinamicamente via JavaScript -->
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div id="listaProntuarios" class="row">
-                            <!-- Prontuários serão carregados aqui -->
+                            
                         </div>
                     </div>
                 </div>
@@ -156,21 +172,22 @@
                 window.location.href = 'login.html';
                 return;
             }
-
+    
             // Exibe o nome do usuário
             document.getElementById('nomeUsuario').textContent = 
                 localStorage.getItem('usuarioNome') || 'Usuário';
-
+    
             // Configura o botão de logout
             document.getElementById('btnLogout').addEventListener('click', function() {
                 localStorage.clear();
                 window.location.href = 'login.html';
             });
-
+    
             // Carrega os dados iniciais
+            carregarFiltroEscolas(); // Novo: Carrega as escolas no filtro
             carregarChamadosParaProntuario();
             carregarListaProntuarios();
-
+    
             // Configura eventos
             document.getElementById('selecionarChamado').addEventListener('change', function() {
                 const chamadoId = this.value;
@@ -182,32 +199,66 @@
                     document.getElementById('infoChamado').classList.add('d-none');
                 }
             });
-
+    
             document.getElementById('btnSalvarProntuario').addEventListener('click', salvarProntuario);
             document.getElementById('btnRemoverProntuario').addEventListener('click', removerProntuario);
+            
+            // Novo: Evento para filtrar por escola
+            document.getElementById('filtroEscola').addEventListener('change', function() {
+                filtrarPorEscola();
+            });
         });
-
+    
         // Variável para armazenar o chamado selecionado
         let chamadoSelecionado = null;
-
+    
+        // Novo: Função para carregar as escolas no filtro
+        function carregarFiltroEscolas() {
+            const selectEscola = document.getElementById('filtroEscola');
+            const chamados = JSON.parse(localStorage.getItem('chamados')) || [];
+            
+            // Obter todas as escolas únicas
+            const escolas = [...new Set(chamados
+                .filter(c => c.prontuario && c.escola)
+                .map(c => c.escola)
+                .sort((a, b) => a.localeCompare(b)))
+            ];
+    
+            // Limpar e adicionar opções
+            selectEscola.innerHTML = '<option value="">Todas as escolas</option>';
+            
+            escolas.forEach(escola => {
+                const option = document.createElement('option');
+                option.value = escola;
+                option.textContent = escola;
+                selectEscola.appendChild(option);
+            });
+        }
+    
+        // Novo: Função para filtrar por escola
+        function filtrarPorEscola() {
+            const escolaSelecionada = document.getElementById('filtroEscola').value;
+            carregarListaProntuarios(escolaSelecionada);
+        }
+    
         // Função para carregar os chamados no dropdown
         function carregarChamadosParaProntuario() {
             const select = document.getElementById('selecionarChamado');
             select.innerHTML = '<option value="">Selecione um chamado</option>';
-
+    
             const chamados = JSON.parse(localStorage.getItem('chamados')) || [];
             
             // Filtra apenas chamados concluídos ou com prontuário
             const chamadosFiltrados = chamados.filter(chamado => 
                 chamado.status === 'Concluído' || chamado.prontuario
             );
-
+    
             if (chamadosFiltrados.length === 0) {
                 select.disabled = true;
                 select.innerHTML = '<option value="">Nenhum chamado disponível</option>';
                 return;
             }
-
+    
             chamadosFiltrados.forEach(chamado => {
                 const option = document.createElement('option');
                 option.value = chamado.id;
@@ -215,30 +266,30 @@
                 select.appendChild(option);
             });
         }
-
+    
         // Função para exibir detalhes do chamado selecionado
         function exibirDetalhesChamado(id) {
             const chamados = JSON.parse(localStorage.getItem('chamados')) || [];
             chamadoSelecionado = chamados.find(c => c.id === id);
-
+    
             if (!chamadoSelecionado) {
                 console.error('Chamado não encontrado');
                 return;
             }
-
+    
             // Atualiza informações do chamado
-            document.getElementById('solicitanteInfo').textContent = chamadoSelecionado.nomeSolicitante;
-            document.getElementById('escolaInfo').textContent = chamadoSelecionado.escola;
-            document.getElementById('defeitoInfo').textContent = chamadoSelecionado.defeito;
+            document.getElementById('solicitanteInfo').textContent = chamadoSelecionado.nomeSolicitante || 'Não informado';
+            document.getElementById('escolaInfo').textContent = chamadoSelecionado.escola || 'Não informada';
+            document.getElementById('defeitoInfo').textContent = chamadoSelecionado.defeito || 'Não especificado';
             
             const statusBadge = document.getElementById('statusInfo');
-            statusBadge.textContent = chamadoSelecionado.status;
+            statusBadge.textContent = chamadoSelecionado.status || 'N/A';
             statusBadge.className = 'badge ' + (chamadoSelecionado.status === 'Concluído' ? 'bg-success' : 'bg-warning');
-
+    
             // Mostra as informações do chamado
             document.getElementById('infoChamado').classList.remove('d-none');
             document.getElementById('nenhumChamadoSelecionado').style.display = 'none';
-
+    
             // Preenche o formulário de prontuário se existir
             if (chamadoSelecionado.prontuario) {
                 document.getElementById('descricaoReparo').value = chamadoSelecionado.prontuario.descricaoReparo || '';
@@ -251,55 +302,59 @@
                 document.getElementById('detalhesProntuario').style.display = 'block';
             }
         }
-
+    
         // Função para salvar o prontuário
         function salvarProntuario() {
-    if (!chamadoSelecionado) return;
-
-    const descricaoReparo = document.getElementById('descricaoReparo').value.trim();
-    if (!descricaoReparo) {
-        alert('A descrição do reparo é obrigatória!');
-        return;
-    }
-
-    // Adiciona um prompt para capturar o nome do técnico
-    const tecnico = prompt('Digite o nome do técnico responsável pelo reparo:') || 
-                   'Técnico não informado';
-
-    const prontuario = {
-        descricaoReparo,
-        pecasTrocadas: document.getElementById('pecasTrocadas').value.trim(),
-        observacoes: document.getElementById('observacoes').value.trim(),
-        dataAtualizacao: new Date().toISOString(),
-        tecnico: document.getElementById('nomeTecnico').value.trim() || 'Técnico não informado'
-    };
-
-    // Resto do código permanece igual...
-    const chamados = JSON.parse(localStorage.getItem('chamados')) || [];
-    const index = chamados.findIndex(c => c.id === chamadoSelecionado.id);
+            if (!chamadoSelecionado) return;
     
-    if (index !== -1) {
-        chamados[index].prontuario = prontuario;
-        
-        if (chamados[index].status !== 'Concluído') {
-            chamados[index].status = 'Concluído';
-            chamados[index].dataReparo = new Date().toISOString();
+            const descricaoReparo = document.getElementById('descricaoReparo').value.trim();
+            if (!descricaoReparo) {
+                alert('A descrição do reparo é obrigatória!');
+                return;
+            }
+    
+            // Solicita o nome do técnico via prompt
+            const tecnico = prompt('Digite o nome do técnico responsável pelo reparo:');
+            if (!tecnico || tecnico.trim() === '') {
+                alert('O nome do técnico é obrigatório!');
+                return;
+            }
+    
+            const prontuario = {
+                descricaoReparo,
+                pecasTrocadas: document.getElementById('pecasTrocadas').value.trim(),
+                observacoes: document.getElementById('observacoes').value.trim(),
+                dataAtualizacao: new Date().toISOString(),
+                tecnico: tecnico.trim()
+            };
+    
+            const chamados = JSON.parse(localStorage.getItem('chamados')) || [];
+            const index = chamados.findIndex(c => c.id === chamadoSelecionado.id);
+            
+            if (index !== -1) {
+                chamados[index].prontuario = prontuario;
+                
+                if (chamados[index].status !== 'Concluído') {
+                    chamados[index].status = 'Concluído';
+                    chamados[index].dataReparo = new Date().toISOString();
+                }
+                
+                localStorage.setItem('chamados', JSON.stringify(chamados));
+                alert('Prontuário salvo com sucesso!');
+                carregarFiltroEscolas(); // Atualiza o filtro de escolas
+                carregarListaProntuarios();
+                carregarChamadosParaProntuario();
+            } else {
+                alert('Erro ao salvar prontuário: chamado não encontrado');
+            }
         }
-        
-        localStorage.setItem('chamados', JSON.stringify(chamados));
-        alert('Prontuário salvo com sucesso!');
-        carregarListaProntuarios();
-    } else {
-        alert('Erro ao salvar prontuário: chamado não encontrado');
-    }
-}
-
+    
         // Função para remover prontuário
         function removerProntuario() {
             if (!chamadoSelecionado || !confirm('Tem certeza que deseja remover este prontuário?')) {
                 return;
             }
-
+    
             const chamados = JSON.parse(localStorage.getItem('chamados')) || [];
             const index = chamados.findIndex(c => c.id === chamadoSelecionado.id);
             
@@ -312,45 +367,75 @@
                 document.getElementById('formProntuario').reset();
                 document.getElementById('detalhesProntuario').style.display = 'none';
                 document.getElementById('nenhumChamadoSelecionado').style.display = 'block';
+                carregarFiltroEscolas(); // Atualiza o filtro de escolas
                 carregarListaProntuarios();
                 carregarChamadosParaProntuario();
             }
         }
-
-        // Função para carregar a lista de prontuários
-        function carregarListaProntuarios() {
+    
+        // Função modificada para carregar a lista de prontuários com filtro por escola
+        function carregarListaProntuarios(filtroEscola = '') {
             const container = document.getElementById('listaProntuarios');
             container.innerHTML = '';
-
+    
             const chamados = JSON.parse(localStorage.getItem('chamados')) || [];
-            const prontuarios = chamados.filter(c => c.prontuario);
-
+            let prontuarios = chamados.filter(c => c.prontuario);
+    
+            // Aplicar filtro de escola se fornecido
+            if (filtroEscola) {
+                prontuarios = prontuarios.filter(chamado => 
+                    chamado.escola && 
+                    chamado.escola.toLowerCase().includes(filtroEscola.toLowerCase())
+                );
+            }
+    
             if (prontuarios.length === 0) {
                 container.innerHTML = `
                     <div class="col-12 text-center py-4">
                         <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
-                        <h5>Nenhum prontuário cadastrado</h5>
+                        <h5>${filtroEscola ? 'Nenhum prontuário para esta escola' : 'Nenhum prontuário cadastrado'}</h5>
                     </div>
                 `;
                 return;
             }
-
+    
             prontuarios.forEach(chamado => {
                 const card = document.createElement('div');
                 card.className = 'col-md-6 mb-3';
                 card.innerHTML = `
                     <div class="card card-prontuario h-100" onclick="selecionarProntuario('${chamado.id}')">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <strong>${chamado.nomeSolicitante}</strong>
+                            <strong>${chamado.nomeSolicitante || 'Não informado'}</strong>
                             <span class="badge ${chamado.status === 'Concluído' ? 'bg-success' : 'bg-warning'}">
-                                ${chamado.status}
+                                ${chamado.status || 'N/A'}
                             </span>
                         </div>
                         <div class="card-body">
-                            <h6 class="card-subtitle mb-2 text-muted">${chamado.escola}</h6>
-                            <p class="card-text"><strong>Defeito:</strong> ${chamado.defeito}</p>
-                            <p class="card-text"><small class="text-muted">
-                                Atualizado em: ${formatarData(chamado.prontuario.dataAtualizacao)}
+                            <h6 class="card-subtitle mb-2 text-muted">${chamado.escola || 'Escola não informada'}</h6>
+                            <p class="card-text"><strong>Defeito:</strong> ${chamado.defeito || 'Não especificado'}</p>
+                            
+                            <div class="d-flex justify-content-between mb-2">
+                                <div>
+                                    <small class="text-muted">Abertura:</small>
+                                    <p class="text-danger mb-0">${formatarData(chamado.dataAbertura)}</p>
+                                </div>
+                                ${chamado.dataReparo ? `
+                                <div>
+                                    <small class="text-muted">Reparo:</small>
+                                    <p class="text-success mb-0">${formatarData(chamado.dataReparo)}</p>
+                                </div>
+                                ` : ''}
+                            </div>
+                            
+                            ${chamado.prontuario?.tecnico ? `
+                            <div class="mb-2">
+                                <small class="text-muted">Técnico:</small>
+                                <p class="mb-0">${chamado.prontuario.tecnico}</p>
+                            </div>
+                            ` : ''}
+                            
+                            <p class="card-text mb-0"><small class="text-muted">
+                                Atualizado em: ${formatarData(chamado.prontuario?.dataAtualizacao) || 'N/A'}
                             </small></p>
                         </div>
                     </div>
@@ -358,166 +443,182 @@
                 container.appendChild(card);
             });
         }
-
+    
         // Função auxiliar para formatar data
         function formatarData(dataISO) {
             if (!dataISO) return 'N/A';
             const data = new Date(dataISO);
             return data.toLocaleDateString('pt-BR');
         }
-
+    
         // Função para selecionar prontuário da lista
         function selecionarProntuario(id) {
             const select = document.getElementById('selecionarChamado');
             select.value = id;
             exibirDetalhesChamado(id);
         }
-
+    
         // Função para gerar o PDF corretamente
         function gerarRelatorioPDF() {
-    try {
-        // Verifica se a biblioteca está disponível
-        if (typeof window.jspdf === 'undefined') {
-            alert('Erro: Biblioteca jsPDF não carregada. Recarregue a página.');
-            return;
-        }
-        
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        
-        // Configurações básicas
-        const margin = 15;
-        let y = 20;
-        const lineHeight = 7;
-        const pageWidth = doc.internal.pageSize.getWidth();
-        
-        // Cabeçalho
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(18);
-        doc.text('RELATÓRIO DE PRONTUÁRIOS', margin, y);
-        
-        y += lineHeight;
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Data de emissão: ${new Date().toLocaleDateString('pt-BR')}`, margin, y);
-        doc.text(`Emitido por: ${localStorage.getItem('usuarioNome') || 'Não informado'}`, pageWidth - margin, y, { align: 'right' });
-        
-        y += lineHeight * 2;
-        doc.line(margin, y, pageWidth - margin, y);
-        y += lineHeight * 2;
-        
-        // Obtém os dados
-        const chamados = JSON.parse(localStorage.getItem('chamados')) || [];
-        const prontuarios = chamados.filter(c => c.prontuario);
-        
-        if (prontuarios.length === 0) {
-            doc.setFontSize(14);
-            doc.text('Nenhum prontuário encontrado.', margin, y);
-        } else {
-            doc.setFontSize(12);
-            
-            prontuarios.forEach((chamado, index) => {
-                // Verifica se precisa de nova página
-                if (y > doc.internal.pageSize.getHeight() - 30) {
-                    doc.addPage();
-                    y = 20;
+            try {
+                if (typeof window.jspdf === 'undefined') {
+                    alert('Erro: Biblioteca jsPDF não carregada. Recarregue a página.');
+                    return;
                 }
                 
-                // Título do prontuário
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Obter filtro ativo
+                const escolaFiltrada = document.getElementById('filtroEscola').value;
+                
+                //Configurações básicas
+                const margin = 15;
+                let y = 20;
+                const lineHeight = 7;
+                const pageWidth = doc.internal.pageSize.getWidth();
+                
+                // Cabeçalho
                 doc.setFont('helvetica', 'bold');
-                doc.text(`PRONTUÁRIO #${index + 1}`, margin, y);
+                doc.setFontSize(18);
+                doc.text('RELATÓRIO DE CHAMADOS', margin, y);
                 
-                // Informações básicas
+                y += lineHeight;
+                doc.setFontSize(12);
                 doc.setFont('helvetica', 'normal');
-                y += lineHeight;
-                doc.text(`Solicitante: ${chamado.nomeSolicitante}`, margin, y);
-                doc.text(`Escola: ${chamado.escola}`, margin + 90, y);
                 
-                y += lineHeight;
-                doc.text(`Defeito: ${chamado.defeito}`, margin, y);
-                doc.text(`Status: ${chamado.status}`, margin + 90, y);
-                
-                y += lineHeight;
-                doc.text(`Data abertura: ${formatarData(chamado.dataAbertura)}`, margin, y);
-                if (chamado.dataReparo) {
-                    doc.text(`Data reparo: ${formatarData(chamado.dataReparo)}`, margin + 90, y);
+                // Adiciona informações do filtro se aplicável
+                if (escolaFiltrada) {
+                    doc.text(`Filtrado por escola: ${escolaFiltrada}`, margin, y);
+                    y += lineHeight;
                 }
                 
-                // Técnico responsável - DESTAQUE
-                y += lineHeight;
-                doc.setFont('helvetica', 'bold');
-                doc.setTextColor(40, 80, 150); // Cor azul para destacar
-                doc.text(`Técnico responsável: ${chamado.prontuario.tecnico || 'Não informado'}`, margin, y);
-                doc.setTextColor(0, 0, 0); // Volta para cor preta
-                doc.setFont('helvetica', 'normal');
+                doc.text(`Data de emissão: ${new Date().toLocaleDateString('pt-BR')}`, margin, y);
+                doc.text(`Emitido por: ${localStorage.getItem('usuarioNome') || 'Não informado'}`, pageWidth - margin, y, { align: 'right' });
                 
-                // Descrição do reparo
-                y += lineHeight * 1.5;
-                doc.setFont('helvetica', 'bold');
-                doc.text('Descrição do Reparo:', margin, y);
-                y += lineHeight;
-                doc.setFont('helvetica', 'normal');
-                const descLines = doc.splitTextToSize(chamado.prontuario.descricaoReparo || 'Não informado', pageWidth - margin * 2);
-                descLines.forEach(line => {
-                    doc.text(line, margin, y);
-                    y += lineHeight;
-                });
+                y += lineHeight * 2;
+                doc.line(margin, y, pageWidth - margin, y);
+                y += lineHeight * 2;
                 
-                // Peças trocadas
-                if (chamado.prontuario.pecasTrocadas) {
-                    y += lineHeight;
-                    doc.setFont('helvetica', 'bold');
-                    doc.text('Peças Trocadas:', margin, y);
-                    y += lineHeight;
-                    doc.setFont('helvetica', 'normal');
-                    doc.text(chamado.prontuario.pecasTrocadas, margin, y);
+                // Obtém os dados com filtro
+                const chamados = JSON.parse(localStorage.getItem('chamados')) || [];
+                let prontuarios = chamados.filter(c => c.prontuario);
+                
+                if (escolaFiltrada) {
+                    prontuarios = prontuarios.filter(chamado => 
+                        chamado.escola && 
+                        chamado.escola.toLowerCase().includes(escolaFiltrada.toLowerCase())
+                    );
                 }
                 
-                // Observações
-                if (chamado.prontuario.observacoes) {
-                    y += lineHeight;
-                    doc.setFont('helvetica', 'bold');
-                    doc.text('Observações:', margin, y);
-                    y += lineHeight;
-                    doc.setFont('helvetica', 'normal');
-                    const obsLines = doc.splitTextToSize(chamado.prontuario.observacoes, pageWidth - margin * 2);
-                    obsLines.forEach(line => {
-                        doc.text(line, margin, y);
+                if (prontuarios.length === 0) {
+                    doc.setFontSize(14);
+                    doc.text('Nenhum prontuário encontrado' + (escolaFiltrada ? ' para esta escola' : ''), margin, y);
+                } else {
+                    doc.setFontSize(12);
+                    
+                    prontuarios.forEach((chamado, index) => {
+                        // Verifica se precisa de nova página
+                        if (y > doc.internal.pageSize.getHeight() - 30) {
+                            doc.addPage();
+                            y = 20;
+                        }
+                        
+                        // Título do prontuário
+                        doc.setFont('helvetica', 'bold');
+                        doc.text(`PRONTUÁRIO #${index + 1}`, margin, y);
+                        
+                        // Informações básicas
+                        doc.setFont('helvetica', 'normal');
                         y += lineHeight;
+                        doc.text(`Solicitante: ${chamado.nomeSolicitante || 'Não informado'}`, margin, y);
+                        doc.text(`Escola: ${chamado.escola || 'Não informada'}`, margin + 90, y);
+                        
+                        y += lineHeight;
+                        doc.text(`Defeito: ${chamado.defeito || 'Não especificado'}`, margin, y);
+                        doc.text(`Status: ${chamado.status || 'N/A'}`, margin + 90, y);
+                        
+                        y += lineHeight;
+                        doc.text(`Data abertura: ${formatarData(chamado.dataAbertura)}`, margin, y);
+                        if (chamado.dataReparo) {
+                            doc.text(`Data reparo: ${formatarData(chamado.dataReparo)}`, margin + 90, y);
+                        }
+                        
+                        // Técnico responsável - DESTAQUE
+                        y += lineHeight;
+                        doc.setFont('helvetica', 'bold');
+                        doc.setTextColor(40, 80, 150);
+                        doc.text(`Técnico responsável: ${chamado.prontuario.tecnico || 'Não informado'}`, margin, y);
+                        doc.setTextColor(0, 0, 0);
+                        doc.setFont('helvetica', 'normal');
+                        
+                        // Descrição do reparo
+                        y += lineHeight * 1.5;
+                        doc.setFont('helvetica', 'bold');
+                        doc.text('Descrição do Reparo:', margin, y);
+                        y += lineHeight;
+                        doc.setFont('helvetica', 'normal');
+                        const descLines = doc.splitTextToSize(chamado.prontuario.descricaoReparo || 'Não informado', pageWidth - margin * 2);
+                        descLines.forEach(line => {
+                            doc.text(line, margin, y);
+                            y += lineHeight;
+                        });
+                        
+                        // Peças trocadas
+                        if (chamado.prontuario.pecasTrocadas) {
+                            y += lineHeight;
+                            doc.setFont('helvetica', 'bold');
+                            doc.text('Peças Trocadas:', margin, y);
+                            y += lineHeight;
+                            doc.setFont('helvetica', 'normal');
+                            doc.text(chamado.prontuario.pecasTrocadas, margin, y);
+                        }
+                        
+                        // Observações
+                        if (chamado.prontuario.observacoes) {
+                            y += lineHeight;
+                            doc.setFont('helvetica', 'bold');
+                            doc.text('Observações:', margin, y);
+                            y += lineHeight;
+                            doc.setFont('helvetica', 'normal');
+                            const obsLines = doc.splitTextToSize(chamado.prontuario.observacoes, pageWidth - margin * 2);
+                            obsLines.forEach(line => {
+                                doc.text(line, margin, y);
+                                y += lineHeight;
+                            });
+                        }
+                        
+                        // Data de atualização
+                        y += lineHeight;
+                        doc.setFont('helvetica', 'italic');
+                        doc.text(`Atualizado em: ${formatarData(chamado.prontuario.dataAtualizacao)}`, margin, y);
+                        
+                        // Divisor entre prontuários
+                        y += lineHeight * 1.5;
+                        if (index < prontuarios.length - 1) {
+                            doc.setDrawColor(200);
+                            doc.line(margin, y, pageWidth - margin, y);
+                            y += lineHeight * 4;
+                        }
                     });
                 }
                 
-                // Data de atualização
-                y += lineHeight;
-                doc.setFont('helvetica', 'italic');
-                doc.text(`Atualizado em: ${formatarData(chamado.prontuario.dataAtualizacao)}`, margin, y);
-                
-                // Divisor entre prontuários
-                y += lineHeight * 1.5;
-                if (index < prontuarios.length - 1) {
-                    doc.setDrawColor(200);
-                    doc.line(margin, y, pageWidth - margin, y);
-                    y += lineHeight * 1.5;
+                // Número de páginas
+                const pageCount = doc.internal.getNumberOfPages();
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(10);
+                    doc.text(`Página ${i} de ${pageCount}`, pageWidth - margin, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
                 }
-            });
+                
+                // Salva o PDF
+                doc.save(`relatorio_prontuarios_${new Date().toISOString().slice(0, 10)}.pdf`);
+                
+            } catch (error) {
+                console.error('Erro ao gerar PDF:', error);
+                alert('Ocorreu um erro ao gerar o PDF. Verifique o console para detalhes.');
+            }
         }
-        
-        // Número de páginas
-        const pageCount = doc.internal.getNumberOfPages();
-        for (let i = 1; i <= pageCount; i++) {
-            doc.setPage(i);
-            doc.setFontSize(10);
-            doc.text(`Página ${i} de ${pageCount}`, pageWidth - margin, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
-        }
-        
-        // Salva o PDF
-        doc.save(`relatorio_prontuarios_${new Date().toISOString().slice(0, 10)}.pdf`);
-        
-    } catch (error) {
-        console.error('Erro ao gerar PDF:', error);
-        alert('Ocorreu um erro ao gerar o PDF. Verifique o console para detalhes.');
-    }
-}
     </script>
 </body>
 </html>
